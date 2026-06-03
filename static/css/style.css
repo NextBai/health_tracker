@@ -195,3 +195,57 @@ main {
     background-color: var(--card-bg);
     display: none;
 }
+
+/* Posture specific 40/60 layout */
+.posture-layout {
+    display: flex;
+    gap: 1.5rem;
+    /* Fit the rest of the screen without scrolling */
+    height: calc(100vh - 250px);
+    min-height: 450px;
+    align-items: stretch;
+}
+
+.posture-video-col {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+}
+
+.posture-metrics-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Override existing for side-by-side */
+.posture-layout .video-container {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+}
+
+.posture-layout #webcam,
+.posture-layout #output_canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.posture-layout .metrics-panel {
+    margin-top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.posture-layout .metric-item {
+    font-size: 1.1rem;
+    padding: 0.75rem 0;
+}
