@@ -4,13 +4,12 @@ from models.database import init_db
 from routes.auth import auth_bp
 from routes.bp import bp_bp
 from routes.ai import ai_bp
-import eventlet
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_health_tracker_key'
 
 # SocketIO setup
-socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
+socketio = SocketIO(app, async_mode='threading', cors_allowed_origins="*")
 
 # Register Blueprints
 app.register_blueprint(auth_bp)
@@ -44,4 +43,4 @@ from routes.posture_socketio import register_socketio_events
 register_socketio_events(socketio)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5000)
+    socketio.run(app, debug=True, port=8080, allow_unsafe_werkzeug=True)
