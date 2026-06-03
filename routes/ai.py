@@ -41,7 +41,7 @@ async def call_ai_agent(user_id):
             ]
             
             response = await client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-5-nano",
                 messages=messages,
                 tools=available_tools
             )
@@ -71,7 +71,7 @@ async def call_ai_agent(user_id):
                     })
                 
                 final_response = await client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model="gpt-5-nano",
                     messages=messages
                 )
                 return final_response.choices[0].message.content
