@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'super_secret_health_tracker_key'
 
 # SocketIO setup
-socketio = SocketIO(app, async_mode='eventlet')
+socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
 
 # Register Blueprints
 app.register_blueprint(auth_bp)
