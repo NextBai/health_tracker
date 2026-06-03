@@ -1,0 +1,43 @@
+graph TD
+    %% 系統架構藍圖
+    subgraph Frontend [前端 (Vanilla JS + CSS)]
+        UI[UI/UX Dark Mode Card]
+        Cam[Webcam & Mediapipe Pose]
+        Chart[Chart.js 血壓圖表]
+    end
+
+    subgraph Backend_Flask [Flask 後端]
+        Auth[使用者認證模組]
+        SocketIO[Socket.IO 伺服器]
+        API[API 路由]
+        Agent[AI Agent (MCP Client)]
+    end
+
+    subgraph MCP_Server [獨立 MCP Server]
+        FastMCP[FastMCP 伺服器]
+        Tools[資料庫讀取 Tools]
+    end
+
+    subgraph Database [資料庫 (SQLite)]
+        SQLite[(Users, Posture_Records, BP_Records)]
+    end
+    
+    subgraph External [外部服務]
+        OpenAI[OpenAI gpt-4o-mini]
+    end
+
+    UI --> Auth
+    Cam -- "posture_update (WebSocket)" --> SocketIO
+    UI -- "CRUD (HTTP)" --> API
+    Chart -- "GET BP Data" --> API
+    UI -- "Ask Advice" --> API
+    API --> Agent
+
+    SocketIO -. "寫入姿態" .-> SQLite
+    API -. "寫入/查詢" .-> SQLite
+    Auth -. "查詢/寫入" .-> SQLite
+
+    Agent -- "Call Tools" --> FastMCP
+    FastMCP -- "Read Data" --> Tools
+    Tools -. "查詢歷史紀錄" .-> SQLite
+    Agent -- "User Profile + History + Prompt" --> OpenAI

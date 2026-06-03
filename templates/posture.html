@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<!-- Socket.IO -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+<!-- MediaPipe Pose -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: var(--primary-color);">動態姿勢偵測</h2>
+    <p>請確保全身或上半身完整進入鏡頭。系統會即時分析特徵點，並每 10 秒自動同步最新指標至資料庫。</p>
+    
+    <div class="video-container">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="output_canvas"></canvas>
+    </div>
+    
+    <div class="metrics-panel">
+        <div class="metric-item"><span>1. 高低肩</span> <span id="m-shoulder" class="status-good">正常</span></div>
+        <div class="metric-item"><span>2. 頭部前傾</span> <span id="m-head" class="status-good">正常</span></div>
+        <div class="metric-item"><span>3. 骨盆傾斜</span> <span id="m-pelvis" class="status-good">正常</span></div>
+        <div class="metric-item"><span>4. 駝背</span> <span id="m-hunch" class="status-good">正常</span></div>
+        <div class="metric-item"><span>5. 圓肩</span> <span id="m-round" class="status-good">正常</span></div>
+        <div class="metric-item"><span>6. 脊椎側彎風險</span> <span id="m-spine" class="status-good">正常</span></div>
+        <div class="metric-item"><span>7. 站姿平衡</span> <span id="m-balance" class="status-good">正常</span></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/posture.js') }}"></script>
+{% endblock %}

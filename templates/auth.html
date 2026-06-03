@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container card">
+    <h2 style="text-align: center; color: var(--primary-color);">
+        {% if mode == 'login' %}登入{% else %}註冊{% endif %}
+    </h2>
+    <form id="auth-form">
+        <div class="form-group">
+            <label>帳號名稱</label>
+            <input type="text" id="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>密碼</label>
+            <input type="password" id="password" class="form-control" required>
+        </div>
+        
+        {% if mode == 'register' %}
+        <div class="form-group">
+            <label>身高 (cm)</label>
+            <input type="number" id="height" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>體重 (kg)</label>
+            <input type="number" id="weight" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>年齡</label>
+            <input type="number" id="age" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>性別</label>
+            <select id="gender" class="form-control">
+                <option value="male">男</option>
+                <option value="female">女</option>
+                <option value="other">其他</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>職業 (如: 工程師)</label>
+            <input type="text" id="occupation" class="form-control" required>
+        </div>
+        {% endif %}
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+            {% if mode == 'login' %}登入{% else %}註冊{% endif %}
+        </button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem;">
+        {% if mode == 'login' %}
+        <p>還沒有帳號？ <a href="{{ url_for('auth.register') }}" style="color: var(--primary-color);">立即註冊</a></p>
+        {% else %}
+        <p>已經有帳號？ <a href="{{ url_for('auth.login') }}" style="color: var(--primary-color);">返回登入</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('auth-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const mode = '{{ mode }}';
+    const payload = {
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+    };
+    
+    if (mode === 'register') {
+        payload.height = document.getElementById('height').value;
+        payload.weight = document.getElementById('weight').value;
+        payload.age = document.getElementById('age').value;
+        payload.gender = document.getElementById('gender').value;
+        payload.occupation = document.getElementById('occupation').value;
+    }
+    
+    const res = await fetch(mode === 'login' ? '/login' : '/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    });
+    
+    const data = await res.json();
+    if (res.ok && data.success) {
+        window.location.href = '/';
+    } else {
+        alert(data.error || '發生錯誤');
+    }
+});
+</script>
+{% endblock %}

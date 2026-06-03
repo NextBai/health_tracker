@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid">
+    <a href="{{ url_for('posture') }}" style="text-decoration: none; color: inherit;">
+        <div class="card">
+            <h2 style="color: var(--primary-color);">動態姿勢偵測</h2>
+            <p>透過 AI 視覺辨識即時分析您的體態，偵測高低肩、駝背、骨盆傾斜等 7 項指標。</p>
+        </div>
+    </a>
+    
+    <a href="{{ url_for('bp_tracker') }}" style="text-decoration: none; color: inherit;">
+        <div class="card">
+            <h2 style="color: var(--primary-color);">血壓紀錄追蹤</h2>
+            <p>紀錄與追蹤您的收縮壓、舒張壓及心率變化，提供視覺化趨勢分析。</p>
+        </div>
+    </a>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h2>AI 綜合健康建議</h2>
+    <p>結合您的姿勢紀錄、血壓趨勢與個人資料，提供專屬的健康改善方案。</p>
+    <button id="btn-get-advice" class="btn btn-primary" style="margin-top: 1rem;">獲取最新建議</button>
+    <div id="ai-advice-container">
+        <div id="ai-advice-content" style="white-space: pre-wrap; line-height: 1.6;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('btn-get-advice').addEventListener('click', async () => {
+    const container = document.getElementById('ai-advice-container');
+    const content = document.getElementById('ai-advice-content');
+    const btn = document.getElementById('btn-get-advice');
+    
+    btn.textContent = '分析中...';
+    btn.disabled = true;
+    container.style.display = 'block';
+    content.innerHTML = 'AI 正在透過 MCP 協議分析您的近期紀錄，請稍候...';
+    
+    try {
+        const res = await fetch('/api/ai_advice');
+        const data = await res.json();
+        if(data.success) {
+            content.textContent = data.advice;
+        } else {
+            content.textContent = '獲取建議失敗: ' + (data.error || '未知錯誤');
+        }
+    } catch(err) {
+        content.textContent = '網路錯誤，請稍後再試。';
+    } finally {
+        btn.textContent = '重新獲取建議';
+        btn.disabled = false;
+    }
+});
+</script>
+{% endblock %}
