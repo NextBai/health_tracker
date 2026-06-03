@@ -29,7 +29,7 @@
 
 {% block extra_scripts %}
 <script>
-document.getElementById('btn-get-advice').addEventListener('click', async () => {
+document.getElementById('btn-get-advice').addEventListener('click', () => {
     const container = document.getElementById('ai-advice-container');
     const content = document.getElementById('ai-advice-content');
     const btn = document.getElementById('btn-get-advice');
@@ -37,22 +37,46 @@ document.getElementById('btn-get-advice').addEventListener('click', async () => 
     btn.textContent = '分析中...';
     btn.disabled = true;
     container.style.display = 'block';
-    content.innerHTML = 'AI 正在透過 MCP 協議分析您的近期紀錄，請稍候...';
+    content.innerHTML = '<em>連線中...</em>';
     
-    try {
-        const res = await fetch('/api/ai_advice');
-        const data = await res.json();
-        if(data.success) {
-            content.textContent = data.advice;
-        } else {
-            content.textContent = '獲取建議失敗: ' + (data.error || '未知錯誤');
+    const source = new EventSource('/api/ai_advice_stream');
+    
+    source.onmessage = (e) => {
+        if (e.data === '[DONE]') {
+            source.close();
+            btn.textContent = '重新獲取建議';
+            btn.disabled = false;
+            return;
         }
-    } catch(err) {
-        content.textContent = '網路錯誤，請稍後再試。';
-    } finally {
+        
+        try {
+            const data = JSON.parse(e.data);
+            if (data.error) {
+                content.textContent += '\n\n獲取建議失敗: ' + data.error;
+                source.close();
+                btn.textContent = '重新獲取建議';
+                btn.disabled = false;
+            } else if (data.status) {
+                if (!content.textContent || content.querySelector('em')) {
+                    content.innerHTML = `<em>${data.status}</em>`;
+                }
+            } else if (data.text) {
+                if (content.querySelector('em')) {
+                    content.textContent = '';
+                }
+                content.textContent += data.text;
+            }
+        } catch(err) {
+            console.error('Parse error:', err);
+        }
+    };
+    
+    source.onerror = (e) => {
+        source.close();
+        content.textContent += '\n\n網路連線中斷或授權失敗，請確認登入狀態並重試。';
         btn.textContent = '重新獲取建議';
         btn.disabled = false;
-    }
+    };
 });
 </script>
 {% endblock %}
